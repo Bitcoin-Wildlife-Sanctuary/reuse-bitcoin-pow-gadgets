@@ -7,3 +7,7 @@ pub mod hash;
 pub mod merkle_hash;
 
 pub mod time;
+
+pub mod compact_target;
+
+pub mod nonce;

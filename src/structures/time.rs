@@ -1,5 +1,4 @@
-use bitcoin::absolute::Time;
-use bitcoin::opcodes::all::OP_PUSHBYTES_4;
+use crate::utils::push_u32;
 use bitvm::treepp::*;
 use covenants_gadgets::utils::pseudo::OP_CAT4;
 
@@ -7,13 +6,7 @@ pub struct TimeGadget;
 
 impl TimeGadget {
     pub fn from_constant(v: u32) -> Script {
-        Script::from_bytes(vec![
-            OP_PUSHBYTES_4.to_u8(),
-            (v & 0xff) as u8,
-            ((v >> 8) & 0xff) as u8,
-            ((v >> 16) & 0xff) as u8,
-            ((v >> 24) & 0xff) as u8,
-        ])
+        push_u32(v)
     }
 
     pub fn from_bitvm_u32() -> Script {
@@ -22,5 +15,27 @@ impl TimeGadget {
             OP_SWAP OP_2SWAP OP_SWAP
             OP_CAT4
         }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use crate::structures::time::TimeGadget;
+    use bitvm::treepp::*;
+    use bitvm::u32::u32_std::u32_push;
+
+    #[test]
+    fn test_bitvm_u32() {
+        let v = 0x12345678;
+
+        let script = script! {
+            { u32_push(v) }
+            { TimeGadget::from_bitvm_u32() }
+            { TimeGadget::from_constant(v) }
+            OP_EQUAL
+        };
+
+        let exec_result = execute_script(script);
+        assert!(exec_result.success);
     }
 }
