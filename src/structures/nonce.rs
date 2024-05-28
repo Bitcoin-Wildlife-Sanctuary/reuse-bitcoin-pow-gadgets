@@ -1,5 +1,5 @@
+use crate::treepp::*;
 use crate::utils::push_u32;
-use bitvm::treepp::*;
 
 pub struct NonceGadget;
 

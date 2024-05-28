@@ -1,5 +1,5 @@
+use crate::treepp::*;
 use crate::utils::push_u32;
-use bitvm::treepp::*;
 use covenants_gadgets::utils::pseudo::OP_CAT4;
 
 pub struct TimeGadget;
@@ -21,7 +21,7 @@ impl TimeGadget {
 #[cfg(test)]
 mod test {
     use crate::structures::time::TimeGadget;
-    use bitvm::treepp::*;
+    use crate::treepp::*;
     use bitvm::u32::u32_std::u32_push;
 
     #[test]

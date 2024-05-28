@@ -4,8 +4,8 @@ use crate::structures::merkle_hash::MerkleHashGadget;
 use crate::structures::nonce::NonceGadget;
 use crate::structures::time::TimeGadget;
 use crate::structures::version::VersionGadget;
+use crate::treepp::*;
 use bitcoin::block::Header;
-pub use bitvm::treepp::*;
 use covenants_gadgets::utils::pseudo::OP_CAT6;
 
 pub struct HeaderGadget;
@@ -33,10 +33,10 @@ impl HeaderGadget {
 #[cfg(test)]
 mod test {
     use crate::structures::header::HeaderGadget;
+    use crate::treepp::*;
     use bitcoin::block::Header;
     use bitcoin::consensus::Decodable;
     use bitcoin::secp256k1::ThirtyTwoByteHash;
-    use bitvm::treepp::*;
     use covenants_gadgets::utils::pseudo::OP_CAT6;
 
     #[test]

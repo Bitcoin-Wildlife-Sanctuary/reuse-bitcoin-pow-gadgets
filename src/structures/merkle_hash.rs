@@ -1,6 +1,6 @@
+use crate::treepp::*;
 use bitcoin::secp256k1::ThirtyTwoByteHash;
 use bitcoin::TxMerkleNode;
-use bitvm::treepp::*;
 use covenants_gadgets::utils::pseudo::OP_CAT2;
 
 pub struct MerkleHashGadget;

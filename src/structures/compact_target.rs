@@ -1,6 +1,6 @@
+use crate::treepp::*;
 use crate::utils::push_u32;
 use bitcoin::CompactTarget;
-use bitvm::treepp::*;
 
 pub struct CompactTargetGadget;
 

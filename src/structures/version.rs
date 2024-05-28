@@ -1,6 +1,6 @@
+use crate::treepp::Script;
 use crate::utils::push_u32;
 use bitcoin::block::Version;
-use bitvm::treepp::Script;
 
 pub struct VersionGadget;
 
