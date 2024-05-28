@@ -105,11 +105,18 @@ impl BlockHashGadget {
                 // but this is not a strict requirement.
                 OP_SIZE 1 OP_EQUALVERIFY
 
-                OP_DUP OP_TOALTSTACK
+                OP_DUP
+                0 OP_EQUAL OP_IF
+                    OP_PUSHBYTES_1 OP_PUSHBYTES_0
+                OP_ELSE
+                    OP_DUP
+                OP_ENDIF
+                OP_TOALTSTACK
+
                 OP_ROT
 
                 // stack: h, leading_zeros / 8, suffix, msb, leading_zeros % 8
-                // altstack: msb
+                // altstack: msb (forcing 0 to be "0")
 
                 OP_DUP OP_TOALTSTACK
 
