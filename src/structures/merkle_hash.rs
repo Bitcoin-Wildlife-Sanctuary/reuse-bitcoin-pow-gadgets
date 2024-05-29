@@ -1,5 +1,4 @@
 use crate::treepp::*;
-use bitcoin::secp256k1::ThirtyTwoByteHash;
 use bitcoin::TxMerkleNode;
 use covenants_gadgets::utils::pseudo::OP_CAT2;
 
@@ -8,7 +7,7 @@ pub struct MerkleHashGadget;
 impl MerkleHashGadget {
     pub fn from_constant(tx_merkle_node: &TxMerkleNode) -> Script {
         script! {
-            { tx_merkle_node.as_raw_hash().into_32().to_vec() }
+            { AsRef::<[u8]>::as_ref(&tx_merkle_node).to_vec() }
         }
     }
 

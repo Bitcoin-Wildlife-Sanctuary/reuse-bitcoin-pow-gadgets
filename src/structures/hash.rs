@@ -1,5 +1,4 @@
 use crate::treepp::*;
-use bitcoin::secp256k1::ThirtyTwoByteHash;
 use bitcoin::BlockHash;
 
 pub struct BlockHashGadget;
@@ -7,7 +6,7 @@ pub struct BlockHashGadget;
 impl BlockHashGadget {
     pub fn from_constant(hash: &BlockHash) -> Script {
         script! {
-            { hash.as_raw_hash().into_32().to_vec() }
+            { AsRef::<[u8]>::as_ref(&hash).to_vec() }
         }
     }
 
@@ -23,7 +22,7 @@ impl BlockHashGadget {
     /// https://github.com/Bitcoin-Wildlife-Sanctuary/bitcoin-circle-stark/blob/main/src/pow/bitcoin_script.rs
     ///
     pub fn push_bit_security_hint(hash: &BlockHash) -> Script {
-        let bytes = hash.as_raw_hash().into_32();
+        let bytes = AsRef::<[u8]>::as_ref(&hash).to_vec();
 
         let mut leading_zeros = 0usize;
         for i in 0..32 {
@@ -257,7 +256,6 @@ mod test {
     use crate::treepp::*;
     use bitcoin::consensus::Decodable;
     use bitcoin::BlockHash;
-    use bitvm::execute_script;
 
     #[test]
     fn test_pow() {

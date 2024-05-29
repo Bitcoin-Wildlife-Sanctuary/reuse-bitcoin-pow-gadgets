@@ -36,7 +36,6 @@ mod test {
     use crate::treepp::*;
     use bitcoin::block::Header;
     use bitcoin::consensus::Decodable;
-    use bitcoin::secp256k1::ThirtyTwoByteHash;
     use covenants_gadgets::utils::pseudo::OP_CAT6;
 
     #[test]
@@ -53,7 +52,7 @@ mod test {
 
             { HeaderGadget::from_constant(&header) }
             { HeaderGadget::compute_hash_from_stack() }
-            { header.block_hash().as_raw_hash().into_32().to_vec() }
+            { AsRef::<[u8]>::as_ref(&header.block_hash()).to_vec() }
             OP_EQUAL
         };
 
