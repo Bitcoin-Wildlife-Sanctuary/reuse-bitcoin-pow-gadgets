@@ -1,6 +1,6 @@
-use std::cmp::min;
 use crate::treepp::*;
 use bitcoin::opcodes::all::OP_PUSHBYTES_4;
+use std::cmp::min;
 
 pub fn push_u32(v: u32) -> Script {
     Script::from_bytes(vec![
