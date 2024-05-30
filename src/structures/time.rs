@@ -16,6 +16,12 @@ impl TimeGadget {
             OP_CAT4
         }
     }
+
+    pub fn from_provided() -> Script {
+        script! {
+            OP_SIZE 4 OP_EQUALVERIFY
+        }
+    }
 }
 
 #[cfg(test)]

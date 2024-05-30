@@ -16,6 +16,12 @@ impl BlockHashGadget {
         }
     }
 
+    pub fn from_provided() -> Script {
+        script! {
+            OP_SIZE 32 OP_EQUALVERIFY
+        }
+    }
+
     /// Push the hint for checking the bit of security
     ///
     /// This is adapted from `bitcoin-circle-stark`, @victorkstarkware
@@ -26,10 +32,10 @@ impl BlockHashGadget {
 
         let mut leading_zeros = 0usize;
         for i in 0..32 {
-            if bytes[i] == 0u8 {
+            if bytes[31 - i] == 0u8 {
                 leading_zeros += 8;
             } else {
-                leading_zeros += bytes[i].leading_zeros() as usize;
+                leading_zeros += bytes[31 - i].leading_zeros() as usize;
                 break;
             }
         }
@@ -38,10 +44,10 @@ impl BlockHashGadget {
             { leading_zeros / 8 }
             { leading_zeros % 8 }
             if leading_zeros % 8 == 0 {
-                { bytes[(leading_zeros / 8)..].to_vec() }
+                { bytes[..31 - (leading_zeros / 8) + 1].to_vec() }
             } else {
-                { bytes[(leading_zeros + 8 - 1) / 8..].to_vec() }
-                { bytes[leading_zeros / 8] }
+                { bytes[..31 - (leading_zeros + 8 - 1) / 8 + 1].to_vec() }
+                { bytes[31 - leading_zeros / 8] }
             }
         }
     }
@@ -51,7 +57,7 @@ impl BlockHashGadget {
     /// hint:
     ///   leading zeros // 8 (must be non-negative and smaller or equal to 32)
     ///   leading zeros % 8 (must be non-negative and smaller or equal to 7)
-    ///   suffix
+    ///   prefix
     ///   msb
     ///
     /// This is adapted from `bitcoin-circle-stark`, @victorkstarkware
@@ -85,13 +91,13 @@ impl BlockHashGadget {
             // stack: h, leading_zeros / 8, leading_zeros % 8
             // altstack: expected length
 
-            // pull the suffix
+            // pull the prefix
             OP_DEPTH OP_1SUB OP_ROLL
 
-            // check the suffix length
+            // check the prefix length
             OP_SIZE OP_FROMALTSTACK OP_EQUALVERIFY
 
-            // stack: h, leading_zeros / 8, leading_zeros % 8, suffix
+            // stack: h, leading_zeros / 8, leading_zeros % 8, prefix
             // check if msb is needed
             OP_OVER OP_0NOTEQUAL
             OP_IF
@@ -114,7 +120,7 @@ impl BlockHashGadget {
 
                 OP_ROT
 
-                // stack: h, leading_zeros / 8, suffix, msb, leading_zeros % 8
+                // stack: h, leading_zeros / 8, prefix, msb, leading_zeros % 8
                 // altstack: msb (forcing 0 to be "0")
 
                 OP_DUP OP_TOALTSTACK
@@ -131,7 +137,7 @@ impl BlockHashGadget {
 
                 OP_SWAP
 
-                // stack: h, leading_zeros / 8, suffix, msb, (2^4 or 2^0), leading_zeros % 4
+                // stack: h, leading_zeros / 8, prefix, msb, (2^4 or 2^0), leading_zeros % 4
                 // altstack: msb, leading_zeros % 8
 
                 OP_DUP
@@ -140,31 +146,31 @@ impl BlockHashGadget {
                     OP_SWAP OP_DUP OP_ADD OP_DUP OP_ADD OP_SWAP
                 OP_ENDIF
 
-                // stack: h, leading_zeros / 8, suffix, msb, (2^6, 2^4, 2^2 or 2^0), leading_zeros % 2
+                // stack: h, leading_zeros / 8, prefix, msb, (2^6, 2^4, 2^2 or 2^0), leading_zeros % 2
                 // altstack: msb, leading_zeros % 8
 
                 OP_IF
                     OP_DUP OP_ADD
                 OP_ENDIF
 
-                // stack: h, leading_zeros / 8, suffix, msb, 1 << (8 - leading_zeros % 8)
+                // stack: h, leading_zeros / 8, prefix, msb, 1 << (8 - leading_zeros % 8)
                 // altstack: msb, leading_zeros % 8
 
                 OP_LESSTHAN OP_VERIFY
 
-                // stack: h, leading_zeros / 8, suffix
+                // stack: h, leading_zeros / 8, prefix
                 // altstack: msb, leading_zeros % 8
             OP_ELSE
                 OP_SWAP OP_TOALTSTACK
                 OP_PUSHBYTES_0 OP_TOALTSTACK
 
-                // stack: h, leading_zeros / 8, suffix
+                // stack: h, leading_zeros / 8, prefix
                 // altstack: msb, leading_zeros % 8
             OP_ENDIF
 
-            // generate the prefix
+            // generate the suffix
             OP_OVER
-            // stack: h, leading_zeros / 8, suffix, leading_zeros / 8
+            // stack: h, leading_zeros / 8, prefix, leading_zeros / 8
             // altstack: msb, leading_zeros % 8
 
             OP_DUP
@@ -178,7 +184,7 @@ impl BlockHashGadget {
             OP_ENDIF
 
             OP_SWAP
-            // stack: h, leading_zeros / 8, suffix, prefix (pending), (leading_zeros / 8) % 16
+            // stack: h, leading_zeros / 8, prefix, suffix (pending), (leading_zeros / 8) % 16
             // altstack: msb, leading_zeros % 8
 
             OP_DUP
@@ -192,7 +198,7 @@ impl BlockHashGadget {
 
                 OP_CAT OP_SWAP
             OP_ENDIF
-            // stack: h, leading_zeros / 8, suffix, prefix (pending), (leading_zeros / 8) % 8
+            // stack: h, leading_zeros / 8, prefix, suffix (pending), (leading_zeros / 8) % 8
             // altstack: msb, leading_zeros % 8
 
             OP_DUP
@@ -205,7 +211,7 @@ impl BlockHashGadget {
 
                 OP_CAT OP_SWAP
             OP_ENDIF
-            // stack: h, leading_zeros / 8, suffix, prefix (pending), (leading_zeros / 8) % 4
+            // stack: h, leading_zeros / 8, prefix, suffix (pending), (leading_zeros / 8) % 4
             // altstack: msb, leading_zeros % 8
 
             OP_DUP
@@ -218,22 +224,22 @@ impl BlockHashGadget {
 
                 OP_CAT OP_SWAP
             OP_ENDIF
-            // stack: h, leading_zeros / 8, suffix, prefix (pending), (leading_zeros / 8) % 2
+            // stack: h, leading_zeros / 8, prefix, suffix (pending), (leading_zeros / 8) % 2
             // altstack: msb, leading_zeros % 8
 
             OP_IF
                 OP_PUSHBYTES_1 OP_PUSHBYTES_0
                 OP_CAT
             OP_ENDIF
-            // stack: h, leading_zeros / 8, suffix, prefix
+            // stack: h, leading_zeros / 8, prefix, suffix
             // altstack: msb, leading_zeros % 8
 
             OP_FROMALTSTACK OP_FROMALTSTACK
-            OP_ROT OP_SWAP OP_CAT
-
-            // stack: h, leading_zeros / 8, suffix, leading_zeros % 8, prefix+msb
-
             OP_ROT OP_CAT
+
+            // stack: h, leading_zeros / 8, prefix, leading_zeros % 8, msb+suffix
+
+            OP_ROT OP_SWAP OP_CAT
 
             // stack: h, leading_zeros / 8, leading_zeros % 8, hash
 
@@ -270,7 +276,8 @@ mod test {
         ]
         .iter()
         .map(|x| {
-            let bytes = hex::decode(x).unwrap();
+            let mut bytes = hex::decode(x).unwrap();
+            bytes.reverse();
             BlockHash::consensus_decode(&mut bytes.as_slice()).unwrap()
         })
         .collect::<Vec<BlockHash>>();
@@ -291,6 +298,8 @@ mod test {
         };
 
         let exec_result = execute_script(script);
+        println!("{:8}", exec_result.final_stack);
+        println!("{:?}", exec_result.error);
         assert!(exec_result.success);
     }
 }

@@ -12,3 +12,12 @@ pub mod structures;
 pub mod spv;
 
 pub mod utils;
+
+#[macro_export]
+macro_rules! consensus_encode {
+    ($x: expr) => {{
+        let mut bytes = vec![];
+        $x.consensus_encode(&mut bytes).unwrap();
+        bytes
+    }};
+}

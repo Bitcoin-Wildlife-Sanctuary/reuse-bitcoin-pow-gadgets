@@ -9,4 +9,10 @@ impl CompactTargetGadget {
         let v = compact_target.to_consensus();
         push_u32(v)
     }
+
+    pub fn from_provided() -> Script {
+        script! {
+            OP_SIZE 4 OP_EQUALVERIFY
+        }
+    }
 }

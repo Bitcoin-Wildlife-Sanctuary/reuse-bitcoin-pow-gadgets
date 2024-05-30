@@ -11,6 +11,12 @@ impl MerkleHashGadget {
         }
     }
 
+    pub fn from_provided() -> Script {
+        script! {
+            OP_SIZE 32 OP_EQUALVERIFY
+        }
+    }
+
     pub fn compute_hash_from_stack() -> Script {
         script! {
             OP_CAT2
