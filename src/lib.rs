@@ -9,4 +9,6 @@ pub(crate) mod treepp {
 
 pub mod structures;
 
+pub mod spv;
+
 pub mod utils;

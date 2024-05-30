@@ -10,6 +10,7 @@ covenants-gadgets = { git = "https://github.com/Bitcoin-Wildlife-Sanctuary/coven
 rand = "0.8.5"
 rand_chacha = "0.3.1"
 sha2 = "0.10.8"
+anyhow = "1.0.86"
 
 [dev-dependencies]
 bitcoin-scriptexec = { git = "https://github.com/Bitcoin-Wildlife-Sanctuary/rust-bitcoin-scriptexec" }
