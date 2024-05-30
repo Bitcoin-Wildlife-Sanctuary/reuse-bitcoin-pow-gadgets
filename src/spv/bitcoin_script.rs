@@ -253,7 +253,7 @@ mod test {
             // 1st block's difficulty count
             { crate::structures::hash::BlockHashGadget::push_bit_security_hint(&BlockHash::from_slice(&first_block_hash).unwrap()) }
 
-            // 2st block header
+            // 2nd block header
             { consensus_encode!(second_block_header.version) }
             { consensus_encode!(second_block_header.merkle_root) }
             { consensus_encode!(second_block_header.time) }
