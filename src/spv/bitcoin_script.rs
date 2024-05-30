@@ -24,7 +24,7 @@ impl TxInclusionProofGadget {
     ///     [each sibling]
     ///
     /// input:
-    ///     leaf hash
+    ///     leaf, which is a txid
     ///
     ///
     /// output:
